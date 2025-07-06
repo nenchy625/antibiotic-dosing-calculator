@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抗菌薬投与量計算アプリ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .section h2 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f5e8;
+            border-radius: 5px;
+            border-left: 4px solid #27ae60;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>抗菌薬投与量計算アプリ</h1>
+        
+        <div class="section">
+            <h2>患者情報</h2>
+            <div class="form-group">
+                <label for="age">年齢 (歳)</label>
+                <input type="number" id="age" min="1" max="120" required>
+            </div>
+            <div class="form-group">
+                <label for="weight">体重 (kg)</label>
+                <input type="number" id="weight" min="1" max="200" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">性別</label>
+                <select id="gender" required>
+                    <option value="">選択してください</option>
+                    <option value="male">男性</option>
+                    <option value="female">女性</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="creatinine">血清クレアチニン値 (mg/dL)</label>
+                <input type="number" id="creatinine" min="0.1" max="20" step="0.01" required>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>抗菌薬選択</h2>
+            <div class="form-group">
+                <label for="antibiotic">抗菌薬</label>
+                <select id="antibiotic" required>
+                    <option value="">選択してください</option>
+                    <optgroup label="ペニシリン系">
+                        <option value="penicillin_g">ペニシリンG (PCG)</option>
+                        <option value="ampicillin">アンピシリン (ABPC)</option>
+                        <option value="ampicillin_sulbactam">アンピシリン/スルバクタム (SBT/ABPC)</option>
+                        <option value="piperacillin">ピペラシリン (PIPC)</option>
+                        <option value="piperacillin_tazobactam">ピペラシリン/タゾバクタム (PIPC/TAZ)</option>
+                    </optgroup>
+                    <optgroup label="セファロスポリン系">
+                        <option value="cefazolin">セファゾリン (CEZ)</option>
+                        <option value="cefotiam">セフォチアム (CTM)</option>
+                        <option value="cefmetazole">セフメタゾール (CMZ)</option>
+                        <option value="cefotaxime">セフォタキシム (CTX)</option>
+                        <option value="ceftriaxone">セフトリアキソン (CTRX)</option>
+                        <option value="ceftazidime">セフタジジム (CAZ)</option>
+                        <option value="cefepime">セフェピム (CFPM)</option>
+                        <option value="aztreonam">アズトレオナム (AZT)</option>
+                    </optgroup>
+                    <optgroup label="カルバペネム系">
+                        <option value="imipenem">イミペネム (IPM/CS)</option>
+                        <option value="meropenem">メロペネム (MEPM)</option>
+                    </optgroup>
+                    <optgroup label="アミノグリコシド系">
+                        <option value="gentamicin">ゲンタマイシン (GM)</option>
+                        <option value="tobramycin">トブラマイシン (TOB)</option>
+                    </optgroup>
+                    <optgroup label="抗MRSA薬">
+                        <option value="vancomycin">バンコマイシン (VCM)</option>
+                        <option value="daptomycin">ダプトマイシン (DAP)</option>
+                        <option value="linezolid">リネゾリド (LZD)</option>
+                    </optgroup>
+                    <optgroup label="その他の抗菌薬">
+                        <option value="clindamycin">クリンダマイシン (CLDM)</option>
+                        <option value="minocycline">ミノサイクリン (MINO)</option>
+                        <option value="ciprofloxacin">シプロフロキサシン (CPFX)</option>
+                        <option value="erythromycin">エリスロマイシン (EM)</option>
+                        <option value="azithromycin">アジスロマイシン (AZM)</option>
+                        <option value="trimethoprim_sulfamethoxazole">ST合剤 (TMP/SMX)</option>
+                        <option value="metronidazole">メトロニダゾール (MNZ)</option>
+                    </optgroup>
+                    <optgroup label="抗真菌薬">
+                        <option value="micafungin">ミカファンギン (MCFG)</option>
+                        <option value="fluconazole">フルコナゾール (FLCZ)</option>
+                        <option value="voriconazole">ボリコナゾール (VRCZ)</option>
+                    </optgroup>
+                    <optgroup label="抗ウイルス薬">
+                        <option value="acyclovir">アシクロビル (ACV)</option>
+                        <option value="ganciclovir">ガンシクロビル (GCV)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="calculateDose()">投与量を計算</button>
+
+        <div id="result" class="result hidden">
+            <h2>計算結果</h2>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
